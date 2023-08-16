@@ -1,0 +1,30 @@
+#clone YOLOv5 and
+!git clone https://github.com/ultralytics/yolov5  # clone repo
+%cd yolov5
+%pip install -qr requirements.txt # install dependencies
+%pip install -q roboflow
+
+import torch
+import os
+from IPython.display import Image, clear_output  # to display images
+
+print(f"Setup complete. Using torch {torch.__version__} ({torch.cuda.get_device_properties(0).name if torch.cuda.is_available() else 'CPU'})")
+
+!python train.py --img 416 --batch 16 --epochs 10 --data path of dataset.yaml --weights yolov5s.pt --cache
+
+# Start tensorboard
+# Launch after you have started training
+# logs save in the folder "runs"
+%load_ext tensorboard
+%tensorboard --logdir runs
+
+!python detect.py --weights path of best.pt --img 416 --conf 0.1 --source path/images/val
+
+#display inference on ALL test images
+
+import glob
+from IPython.display import Image, display
+
+for imageName in glob.glob('/content/yolov5/runs/train/exp3/weights/best.pt/*.jpg'): #assuming JPG
+    display(Image(filename=imageName))
+    print("\n")
